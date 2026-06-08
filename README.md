@@ -9,7 +9,6 @@ SMTP relay server that forwards mail to Postmarkapp.
 - **Kernel**: 5.15.0-181-generic
 - **CPU**: 2 vCPUs
 - **RAM**: 4 GB (260 MB used)
-- **Disk**: 22 GB (5.5 GB used, 26%)
 - **Hostname**: smtp5.cogburnbros.com
 - **IP**: 107.1.158.14/27
 
