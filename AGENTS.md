@@ -6,7 +6,7 @@ SMTP relay for Cogburn Bros. Accepts mail from internal apps and devices on port
 
 ## Architecture
 
-- Go binary `smtprelay` (github.com/decke/smtprelay) under `smtpadmin` user
+- Go binary `smtprelay` under `smtpadmin` user, forked at [cogburnbros/context-smtprelay](https://github.com/cogburnbros/context-smtprelay) (injects blank body for copiers that send messages without one, which Postmark otherwise rejects)
 - Caddy (v2.7.6 + DNSimple plugin) handles Let's Encrypt cert renewal via DNS-01
 - UFW firewall: SSH/465/587 open, default deny everything else
 - No Postfix, no Dovecot, no traditional mail stack - just the relay binary
@@ -40,3 +40,10 @@ SMTP relay for Cogburn Bros. Accepts mail from internal apps and devices on port
 - UFW: `sudo ufw` commands
 - SSH: prefer drop-in at `/etc/ssh/sshd_config.d/hardening.conf`; validate with `sshd -t` before restart
 - Always test SSH connectivity from a separate terminal after SSH changes
+
+### Adding/Removing SMTP Credentials
+
+See README.md "Managing Credentials" section. Key points:
+- Hash passwords with `cd ~/Code/smtprelay && go run cmd/hasher.go 'password'`
+- Edit `~/.config/smtprelay/allowed_users.txt`
+- `sudo systemctl restart smtprelay`

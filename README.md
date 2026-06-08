@@ -10,13 +10,16 @@ SMTP relay server that forwards mail to Postmarkapp.
 - **CPU**: 2 vCPUs
 - **RAM**: 4 GB (260 MB used)
 - **Disk**: 22 GB (5.5 GB used, 26%)
+- **Hostname**: smtp5.cogburnbros.com
 - **IP**: 107.1.158.14/27
 
 ## Services
 
 ### smtprelay (primary)
 
-Go binary ([github.com/decke/smtprelay](https://github.com/decke/smtprelay)), runs as systemd service under `smtpadmin`.
+Go binary, runs as systemd service under `smtpadmin`.
+
+Forked at [cogburnbros/context-smtprelay](https://github.com/cogburnbros/context-smtprelay) because many of our copiers send messages without a body, which Postmark's API rejects. The fork injects a blank body so these messages are accepted.
 
 - **Listen**: `starttls://0.0.0.0:587` and `tls://0.0.0.0:465`
 - **TLS enforced**: yes (`local_forcetls = true`)
@@ -45,7 +48,6 @@ Caddy v2.7.6 with DNSimple plugin, runs as systemd service under `smtpadmin`.
 - `unattended-upgrades` (security updates)
 - `apparmor`
 - `qemu-guest-agent` (for Proxmox clean shutdown/snapshots)
-- `unattended-upgrades` (security updates)
 
 ## Auth Users (allowed_users.txt)
 
@@ -64,6 +66,35 @@ Caddy v2.7.6 with DNSimple plugin, runs as systemd service under `smtpadmin`.
 | peaceriver | Peace River copier |
 
 All restricted to `@smtp5.cogburnbros.com` and `@cogburnbros.com` sender domains.
+
+### Managing Credentials
+
+SMTP auth credentials are stored in `/home/smtpadmin/.config/smtprelay/allowed_users.txt`.
+
+Format: `username bcrypt-hash [email[,email[,...]]]`
+
+The third field restricts allowed sender addresses:
+- Omit = user can send from any address
+- `@domain.com` = user can send from any address at that domain
+- `user@domain.com` = exact match only
+
+**To add or change a user:**
+
+1. SSH in as smtpadmin
+2. Generate a bcrypt hash (must be in the source dir):
+   ```
+   cd ~/Code/smtprelay
+   go run cmd/hasher.go 'the-password'
+   ```
+3. Edit `~/.config/smtprelay/allowed_users.txt` and add/update the line
+4. Restart: `sudo systemctl restart smtprelay`
+
+**To remove a user:**
+
+1. Delete the line from `allowed_users.txt`
+2. Restart: `sudo systemctl restart smtprelay`
+
+Always back up `allowed_users.txt` before editing. The file is owned by `smtpadmin:smtpadmin`.
 
 ## UFW Firewall
 
