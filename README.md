@@ -48,23 +48,9 @@ Caddy v2.7.6 with DNSimple plugin, runs as systemd service under `smtpadmin`.
 - `apparmor`
 - `qemu-guest-agent` (for Proxmox clean shutdown/snapshots)
 
-## Auth Users (allowed_users.txt)
+## Auth Users
 
-17 SMTP auth accounts for internal apps/devices:
-
-| User | Purpose |
-|------|---------|
-| smtpsuperuser | superuser |
-| chandler, kwise, rhonda, april, jamf, it | staff/Jamf |
-| 3cx | phone system |
-| tallwood | Tallwood |
-| truenas | TrueNAS |
-| callahancopier, ftmyerscopier | copiers (Canon) |
-| domainpanel | Domain Panel |
-| canon, canon2, peaceriver, venice | copiers |
-| peaceriver | Peace River copier |
-
-All restricted to `@smtp5.cogburnbros.com` and `@cogburnbros.com` sender domains.
+SMTP auth accounts are in `/home/smtpadmin/.config/smtprelay/allowed_users.txt` on the server. Don't maintain a copy here.
 
 ### Managing Credentials
 
