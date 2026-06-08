@@ -88,7 +88,6 @@ The third field restricts allowed sender addresses:
    ```
 3. Edit `~/.config/smtprelay/allowed_users.txt` and add/update the line
 4. Restart: `sudo systemctl restart smtprelay`
-   (Note: `systemctl reload smtprelay` sends USR1, which smtprelay does not handle. Use `restart`.)
 
 **To remove a user:**
 

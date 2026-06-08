@@ -46,4 +46,4 @@ SMTP relay for Cogburn Bros. Accepts mail from internal apps and devices on port
 See README.md "Managing Credentials" section. Key points:
 - Hash passwords with `cd ~/Code/smtprelay && go run cmd/hasher.go 'password'`
 - Edit `~/.config/smtprelay/allowed_users.txt`
-- `sudo systemctl restart smtprelay` (not reload - smtprelay doesn't handle USR1)
+- `sudo systemctl restart smtprelay`
