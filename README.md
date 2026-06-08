@@ -109,7 +109,9 @@ Email delivery paths at Cogburn Bros:
 
 Key-only auth (password auth disabled). The `cogburnadmin1` ed25519 private key is in the **IT 1Password Vault**.
 
-## Issues / To Do
+## Backups
+
+VM is backed up regularly to PBS (Proxmox Backup Server) via the hypervisor. Before making risky changes, trigger a manual backup from pve1 so you can restore the VM if something goes wrong.
 
 Nothing known.
 

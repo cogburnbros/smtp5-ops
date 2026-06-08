@@ -33,7 +33,9 @@ SMTP relay for Cogburn Bros. Accepts mail from internal apps and devices on port
 - DSA/RSA/ECDSA host keys removed
 - UFW simplified from 128 per-IP rules to 3 open port rules (22, 465, 587)
 
-## Making Changes
+## Backups
+
+VM is backed up regularly to PBS (Proxmox Backup Server). Before risky changes, trigger a manual backup from pve1 so you can restore the VM if needed.
 
 - smtprelay: edit config, then `sudo systemctl restart smtprelay`
 - Caddy: edit Caddyfile/env, then `sudo systemctl restart caddy`
