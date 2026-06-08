@@ -89,7 +89,7 @@ Default deny incoming, allow outgoing. Ports open to the world:
 - **465/tcp** - SMTPS (TLS, auth required)
 - **587/tcp** - SMTP STARTTLS (auth required)
 
-Previously had 128 per-IP allow rules for SMTP and SSH. Simplified 2026-06-08 since smtprelay enforces TLS + bcrypt auth + sender domain restriction, and SSH is key-only. Old ruleset backed up at `/etc/ufw/user.rules.bak.2026-06-08`.
+Previously had 128 per-IP allow rules for SMTP and SSH. Simplified 2026-06-08: smtprelay enforces TLS on every connection, requires bcrypt-hashed SMTP auth, and restricts sender addresses to @cogburnbros.com domains, so a per-IP allowlist adds operational burden without meaningful security gain. The real risks are credential theft (which an IP list doesn't prevent) and connection flooding (which Postmark's delivery limits cap downstream). SSH is key-only with ed25519, no password auth. Opening the ports eliminates the ongoing chore of maintaining Jamf's rotating IPs, new copiers, and staff home addresses in UFW. A trusted-IP allowlist would be nice to have someday if a low-maintenance way to manage it emerges, but the current setup is safe and simple.
 
 ## Mail Flow
 
