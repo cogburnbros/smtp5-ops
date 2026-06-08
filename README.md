@@ -88,6 +88,7 @@ The third field restricts allowed sender addresses:
    ```
 3. Edit `~/.config/smtprelay/allowed_users.txt` and add/update the line
 4. Restart: `sudo systemctl restart smtprelay`
+   (Note: `systemctl reload smtprelay` sends USR1, which smtprelay does not handle. Use `restart`.)
 
 **To remove a user:**
 
@@ -201,3 +202,9 @@ Removed DSA, RSA, and ECDSA host keys (backed up then deleted).
 | `/home/smtpadmin/bin/mail-test` | curl-based SMTP test script |
 | `/home/smtpadmin/bin/backups/` | backup dir |
 | `/var/log/smtprelay/` | log dir (empty, logs go to journald) |
+
+### Tailing Logs
+
+```bash
+sudo journalctl -xefu smtprelay
+```
