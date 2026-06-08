@@ -11,7 +11,6 @@ SMTP relay server that forwards mail to Postmarkapp.
 - **RAM**: 4 GB (260 MB used)
 - **Disk**: 22 GB (5.5 GB used, 26%)
 - **IP**: 107.1.158.14/27
-- **Uptime**: fresh reboot (2026-06-08)
 
 ## Services
 
