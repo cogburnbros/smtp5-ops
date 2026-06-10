@@ -44,6 +44,7 @@ Caddy v2.7.6 with DNSimple plugin, runs as systemd service under `smtpadmin`.
 
 - `ssh` (OpenSSH 8.9p1)
 - `ufw` (firewall)
+- `fail2ban` (auto-ban for SSH and SMTP auth failures)
 - `unattended-upgrades` (security updates)
 - `apparmor`
 - `qemu-guest-agent` (for Proxmox clean shutdown/snapshots)
@@ -91,6 +92,34 @@ Default deny incoming, allow outgoing. Ports open to the world:
 
 Previously had 128 per-IP allow rules for SMTP and SSH. Simplified 2026-06-08 since smtprelay enforces TLS + bcrypt auth + sender domain restriction, and SSH is key-only. Old ruleset backed up at `/etc/ufw/user.rules.bak.2026-06-08`.
 
+## fail2ban
+
+fail2ban watches for repeated auth failures and inserts UFW deny rules automatically. Bans expire on their own.
+
+Three jails configured:
+
+| Jail | Trigger | Ban duration | What it watches |
+|------|---------|--------------|-----------------|
+| sshd | 3 fails / 10min | 24h | Invalid users, root brute force, bad MAC/host key negotiation |
+| smtprelay | 5 fails / 10min | 24h | Bad SMTP AUTH (wrong user or wrong password) |
+| recidive | 3 bans / 7 days | 30d | IPs that keep coming back after bans expire |
+
+Office network `107.1.158.0/27` is whitelisted from all jails. localhost too.
+
+Config files (drop-in only, no stock edits):
+
+- `/etc/fail2ban/jail.d/smtp5.conf` - jail definitions
+- `/etc/fail2ban/filter.d/smtprelay.conf` - custom filter matching `WRN auth error` log lines
+
+Useful commands:
+
+```bash
+sudo fail2ban-client status          # all jails
+sudo fail2ban-client status sshd     # per-jail detail
+sudo fail2ban-client set sshd banip 1.2.3.4   # manual ban
+sudo fail2ban-client set sshd unbanip 1.2.3.4 # manual unban
+```
+
 ## Mail Flow
 
 ```
@@ -114,6 +143,24 @@ Key-only auth (password auth disabled). The `cogburnadmin1` ed25519 private key 
 VM is backed up regularly to PBS (Proxmox Backup Server) via the hypervisor. Before making risky changes, trigger a manual backup from pve1 so you can restore the VM if something goes wrong.
 
 Nothing known.
+
+## Completed (2026-06-10)
+
+### fail2ban
+
+Installed fail2ban with three jails (sshd, smtprelay, recidive). All bans use UFW action so denied IPs are visible in `ufw status`. Bans auto-expire.
+
+Custom smtprelay filter matches `WRN auth error` log lines:
+- `error="User not found"` - unknown SMTP username
+- `error="Password invalid"` - wrong password for known username
+
+Both patterns confirmed via live test with `openssl s_client`.
+
+Also removed 83 static per-IP UFW deny rules that were added earlier in the session. fail2ban now handles all auto-banning.
+
+### SMTP relay opened to the world
+
+Ports 465 and 587 were opened to all IPs (UFW `allow` rules without source restriction). Previously SMTP was restricted to known office/scanner IPs. This is safe because smtprelay enforces TLS + bcrypt auth + sender domain restriction per user.
 
 ## Completed (2026-06-08)
 
@@ -188,6 +235,8 @@ Removed DSA, RSA, and ECDSA host keys (backed up then deleted).
 | `/home/smtpadmin/bin/mail-test` | curl-based SMTP test script |
 | `/home/smtpadmin/bin/backups/` | backup dir |
 | `/var/log/smtprelay/` | log dir (empty, logs go to journald) |
+| `/etc/fail2ban/jail.d/smtp5.conf` | fail2ban jail definitions |
+| `/etc/fail2ban/filter.d/smtprelay.conf` | custom smtprelay auth failure filter |
 
 ### Tailing Logs
 

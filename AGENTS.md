@@ -24,7 +24,7 @@ SMTP relay for Cogburn Bros. Accepts mail from internal apps and devices on port
 
 ## Completed (2026-06-08)
 
-- Kernel upgraded 5.15.0-171 → -181, rebooted
+- Kernel upgraded 5.15.0-171 => -181, rebooted
 - Full apt dist-upgrade applied (63 packages, 0 remaining)
 - qemu-guest-agent installed and active
 - cloud-init disabled
@@ -33,12 +33,19 @@ SMTP relay for Cogburn Bros. Accepts mail from internal apps and devices on port
 - DSA/RSA/ECDSA host keys removed
 - UFW simplified from 128 per-IP rules to 3 open port rules (22, 465, 587)
 
+## Completed (2026-06-10)
+
+- fail2ban installed and configured with 3 jails (sshd, smtprelay, recidive)
+- All bans go through UFW; static per-IP deny rules removed
+- Office network 107.1.158.0/27 whitelisted from all jails
+
 ## Backups
 
 VM is backed up regularly to PBS (Proxmox Backup Server). Before risky changes, trigger a manual backup from pve1 so you can restore the VM if needed.
 
 - smtprelay: edit config, then `sudo systemctl restart smtprelay`
 - Caddy: edit Caddyfile/env, then `sudo systemctl restart caddy`
+- fail2ban: edit `/etc/fail2ban/jail.d/smtp5.conf` or `/etc/fail2ban/filter.d/smtprelay.conf`, then `sudo systemctl restart fail2ban`
 - UFW: `sudo ufw` commands
 - SSH: prefer drop-in at `/etc/ssh/sshd_config.d/hardening.conf`; validate with `sshd -t` before restart
 - Always test SSH connectivity from a separate terminal after SSH changes
